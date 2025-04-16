@@ -105,15 +105,15 @@ x_i = L*pos_i/n_points;
 x_k = L*pos_k/n_points;
 
 G = [];
-vals=zeros(4,2);
-i = sqrt(-1);
-
+j = sqrt(-1);
 
 for f=1:length(F_resp)
     sum = 0;
-    for j=1:n_modes
-        m_i = trapz(length(phi_matrix), m.*phi_matrix(:,j).^2);
-        sum = sum + phi_matrix(pos_i, j)*phi_matrix(pos_k, j)/m_i/(-(F_resp(f)*2*pi)^2+2*i*zeta_i*w_nat(j)*(F_resp(f)*2*pi)+w_nat(j)^2);
+    for i=1:n_modes
+        m_i = trapz(x, m.*phi_matrix(:,i).^2);
+        omega = F_resp(f)*2*pi;
+        w_i =  w_nat(i);
+        sum = sum + (phi_matrix(pos_i, i)*phi_matrix(pos_k, i)/m_i)/(-omega^2 + j*2*zeta_i*w_i*omega + w_i^2);
     end
     
     G(f) = sum;
