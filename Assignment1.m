@@ -103,7 +103,7 @@ end
 zeta_i = 0.01;
 f1 = 1;
 f2 = 200;
-F_resp_size = 50000;
+F_resp_size = 30000;
 
 % indices over the span of vector x ([0, 1000])
 pos_i = 166;
@@ -115,7 +115,7 @@ pos_k = 1000;
 
 % Compute magnitude and phase
 FRF_magnitude = abs(G);
-FRF_phase = rad2deg(angle(G)); % convert to degrees
+FRF_phase = rad2deg(angle(-G)); % convert to degrees
 
 % Plot magnitude
 figure;
@@ -137,7 +137,7 @@ ylabel('Phase (rad)');
 %% Points 3 and 4 Modal Identification
 
 % Add points depending on preferences
-points = [[500, 200]; [400,300]; [150,500]];
+points = [[166, 1000]; [400,300]; [150,500]];
 n_samples = length(points);
 FRFs = zeros(n_samples, F_resp_size);
 f_ranges = {};
@@ -146,62 +146,78 @@ for k=1:n_samples
     [FRFs(k,:), f_ranges{k}] = freq_resp(phi_matrix, w_nat, points(k,1), points(k,2), m, zeta_i, x, f1, f2, F_resp_size);
 end
 
-% Initial guesses
+% Initial guesses (may change implementation)
+% These are independent of n_samples
 w_guess = 28;
 zeta_guess = 0.01;
+
+% These are 1 per sample
 A_guess = 0.08;
 Rl_guess = 0;
 Rh_guess = 0;
 
-p0 = [w_guess, zeta_guess, A_guess, Rl_guess, Rh_guess];
-
-% Options for the solver (optional)
-opts = optimoptions('lsqnonlin', 'Display', 'iter');
+p1 = repmat([A_guess, Rl_guess, Rh_guess], 1, n_samples);
+p0 = [w_guess, zeta_guess, p1];
 
 % Estimate Parameters
-f1 = 4; %Hz
-f2 = 5; %Hz
-p_est = lsqnonlin(@(p) errfunc(FRFs, f1, f2, F_resp, p), p0, [], [], opts);
+f1 = 0.01; %Hz
+f2 = 15; %Hz
+p_est = lsqnonlin(@(p) errfunc(FRFs, f1, f2, F_resp, p), p0, [], [], []);
 
-w_i_est    = p_est(1);
-zeta_i_est = p_est(2);
-A_i_est    = p_est(3);
-Rl_est     = p_est(4);
-Rh_est     = p_est(5);
-
+f1 = 4;
+f2 = 5;
 [~, idx_f1] = min(abs(F_resp - f1));
 [~, idx_f2] = min(abs(F_resp - f2));
 
-Gnum = [];
+Gnum = zeros(1, length(F_resp));
+Gnum_jk = zeros(n_samples, length(F_resp));
 
-for f = F_resp
-    omega = 2*pi*f;
-    Gnum(end+1) = freq_resp_numerical(omega, w_i_est, zeta_i_est, A_i_est, ...
+% Estimated w_nat and zeta
+w_i_est    = p_est(1);
+zeta_i_est = p_est(2);
+
+for f = 1:length(F_resp)
+    freq = F_resp(f);
+    omega = 2*pi*freq;
+    for idx_r = 1:n_samples
+        r = 3 + 3*(idx_r-1);
+        % Sample dependent parameters
+        A_i_est    = p_est(r);
+        Rl_est     = p_est(r+1);
+        Rh_est     = p_est(r+2);
+
+        Gnum_jk(idx_r, f) = Gnum_jk(idx_r, f) + freq_resp_numerical(omega, w_i_est, zeta_i_est, A_i_est, ...
         Rl_est, Rh_est);
+    end
+ 
 end
 
+Gnum_1 = Gnum_jk(1,:);
 
-% Plot magnitude
+% Plot magnitude for point 1
 figure;
 semilogy(F_resp, FRF_magnitude, 'b', 'LineWidth', 1.5);
 grid on;
 hold on;
 %semilogy(F_resp, abs(Gnum),'or');
-semilogy(F_resp(idx_f1:idx_f2), abs(Gnum(idx_f1:idx_f2)),'or');
+semilogy(F_resp(idx_f1:idx_f2), abs(Gnum_1(idx_f1:idx_f2)),'or');
 xlabel('Frequency (Hz)');
+xlim([3 6]);
+ylim([1e-4 1e-1]);
 ylabel('|G| (m/N)');
 title('Magnitude Estimation');
 
 
 % Plot phase
 figure
-plot(F_resp, FRF_phase, 'r', 'LineWidth', 1.5);
+plot(F_resp, FRF_phase, 'LineWidth', 1.5);
 grid on;
 hold on;
 %plot(F_resp, rad2deg(angle(Gnum)),'or');
-plot(F_resp(idx_f1:idx_f2), rad2deg(angle(Gnum(idx_f1:idx_f2))),'or');
+plot(F_resp(idx_f1:idx_f2), rad2deg(angle(-Gnum_1(idx_f1:idx_f2))),'or');
 ylim([-270 270])
 xlabel('Frequency (Hz)');
+xlim([3 6]);
 ylabel('Phase (rad)');
 title('Phase Estimation');
 
@@ -240,26 +256,29 @@ function Gnum = freq_resp_numerical(omega, w_i, zeta_i, A_i, Rl, Rh)
 end
 
 function epsilon = errfunc(FRFs, f1, f2, F_resp, p)
-    w_i    = p(1);
-    zeta_i = p(2);
-    A_i    = p(3);
-    Rl     = p(4);
-    Rh     = p(5);
+    n = length(FRFs(:,1)');  % Number of sampled FRFs
 
     [~, idx_f1] = min(abs(F_resp - f1));
     [~, idx_f2] = min(abs(F_resp - f2));
 
     F = F_resp(idx_f1:idx_f2);
-
-    n = length(FRFs(:,1)');  % Number of known data points
     m = length(F);  % Number of frequency points
     
+    % Estimated w_nat and zeta
+    w_i    = p(1);
+    zeta_i = p(2);
 
     epsilon = zeros(2 * n * m, 1);
     idx = 1;
 
-    for r = 1:n
-        Gexp = FRFs(r,:);
+    for idx_r = 1:n
+        r = 3 + 3*(idx_r-1);
+        Gexp = FRFs(idx_r,:);
+        
+        % Sample dependent parameters
+        A_i    = p(r);
+        Rl     = p(r+1);
+        Rh     = p(r+2);
         for f = F
             [~, pos] = min(abs(F_resp - f));
             omega = f*2*pi;
