@@ -29,6 +29,7 @@ freq_size = (fmax - fmin)/df;
 %% Set space domain and resolution
 n_points = 1000;
 x = linspace(0, L, n_points);
+dx = L/n_points;
 
 
 F=0:df:fmax;
@@ -103,7 +104,7 @@ end
 zeta_i = 0.01;
 f1 = 1;
 f2 = 200;
-F_resp_size = 30000;
+F_resp_size = 10000;
 
 % indices over the span of vector x ([0, 1000])
 pos_i = 166;
@@ -137,7 +138,7 @@ ylabel('Phase (rad)');
 %% Points 3 and 4 Modal Identification
 
 % Add points depending on preferences
-points = [[166, 1000]; [400,300]; [150,500]];
+points = [[166, 1000]; [400,1000]; [777, 1000]; [1000, 1000]];
 n_samples = length(points);
 FRFs = zeros(n_samples, F_resp_size);
 f_ranges = {};
@@ -220,6 +221,29 @@ xlabel('Frequency (Hz)');
 xlim([3 6]);
 ylabel('Phase (rad)');
 title('Phase Estimation');
+
+%% Mode Shape Comparison
+
+% Here we use our estimation around the 1st natural frequency, so we have
+% to compare with the 1st mode shape obtained in parts 1 and 2
+
+A1_est = p_est(3:3:end);
+phi_exp = real(A1_est);
+phi_exp_norm = phi_exp / max(abs(phi_exp));
+
+x_positions = points(:,1).*dx;
+
+figure;
+plot(x, phi_matrix(:,1),'LineWidth',1.5);
+hold on;
+grid on;
+plot(x_positions, -phi_exp_norm, 'o-', 'DisplayName', 'Experimental');
+xlabel('Position (m)');
+ylabel('Displacement');
+title('Mode Shape Comparison');
+
+
+
 
 
 
