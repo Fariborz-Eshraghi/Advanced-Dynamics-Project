@@ -21,11 +21,15 @@ f_f = 5; %Hz - Frequency
 %%%
 %% Set frequency range and frequency resolution
 df   = 1.0000e-04; %Hz
+fmin = 0; %Hz
 fmax = 200; %Hz
+freq_size = (fmax - fmin)/df;
 %%%
+
 %% Set space domain and resolution
 n_points = 1000;
 x = linspace(0, L, n_points);
+
 
 F=0:df:fmax;
 w=F.*2.*pi;
@@ -54,10 +58,6 @@ hold on, grid on, xlabel('f [Hz]')
 
 plot(F(locs),abs(dets(locs)),'or')
 
-phi = cell(1, length(w_nat));
-phi_n = cell(1, length(w_nat));
-
-
 %% Find Mode Shapes
 for i=1:length(w_nat)
    H_i = H(w_nat(i));
@@ -66,7 +66,7 @@ for i=1:length(w_nat)
    
    X_ihat = -inv(H_ihat)*N_ihat;
    X_i = [1, X_ihat'];
-   xj_n{i} = X_i/max(abs(X_i));
+   xj_n{i} = X_i;
    xj{i} = X_i;
 end
 
@@ -77,7 +77,7 @@ n_modes = length(w_nat);
 phi_matrix = zeros(length(x), n_modes);
 gamma = sqrt(w_nat)*c;
 
-figure(2) 
+figure(2)
 
 for j=1:n_modes
    A = xj_n(1,j);
@@ -85,43 +85,37 @@ for j=1:n_modes
    C = xj_n(3,j);
    D = xj_n(4,j);
    
-   phi_matrix(:,j) = A*cos(gamma(j)*x) + B*sin(gamma(j)*x)+C*cosh(gamma(j)*x)+ D*sinh(gamma(j)*x);
+   phi_matrix(:,j) = A*cos(gamma(j)*x) + B*sin(gamma(j)*x) + C*cosh(gamma(j)*x) + D*sinh(gamma(j)*x);
+   phi_matrix(:,j) = phi_matrix(:,j)/max(abs(phi_matrix(:,j)));
+
    plot(x, phi_matrix(:,j),'LineWidth',1.5);
    xlabel('Position (m)')
    ylabel('Displacement (m)')
    title('Normalized Mode Shapes')
    hold on
+   grid on
 end
 
 
 %% Frequency Response
+
+% Set Parameters
 zeta_i = 0.01;
-F_resp = linspace(0, fmax, 10000);
+f1 = 1;
+f2 = 200;
+F_resp_size = 50000;
 
 % indices over the span of vector x ([0, 1000])
 pos_i = 166;
 pos_k = 1000;
-x_i = L*pos_i/n_points;
-x_k = L*pos_k/n_points;
 
-G = [];
-j = sqrt(-1);
-
-for f=1:length(F_resp)
-    sum = 0;
-    for i=1:n_modes
-        m_i = trapz(x, m.*phi_matrix(:,i).^2);
-        omega = F_resp(f)*2*pi;
-        w_i =  w_nat(i);
-        sum = sum + (phi_matrix(pos_i, i)*phi_matrix(pos_k, i)/m_i)/(-omega^2 + j*2*zeta_i*w_i*omega + w_i^2);
-    end
-    
-    G(f) = sum;
-end
+% Compute Frequency Response
+[G, F_resp]  = freq_resp(phi_matrix, w_nat, pos_i, pos_k, m, zeta_i, x, ...
+                         f1, f2, F_resp_size);
 
 % Compute magnitude and phase
 FRF_magnitude = abs(G);
-FRF_phase = angle(G); % convert to degrees
+FRF_phase = rad2deg(angle(G)); % convert to degrees
 
 % Plot magnitude
 figure;
@@ -129,13 +123,153 @@ subplot(2,1,1);
 semilogy(F_resp, FRF_magnitude, 'b', 'LineWidth', 1.5);
 grid on;
 xlabel('Frequency (Hz)');
-ylabel('|FRF|');
-title('Frequency Response Function - Magnitude');
+ylabel('|G| (m/N)');
+
 
 % Plot phase
 subplot(2,1,2);
 plot(F_resp, FRF_phase, 'r', 'LineWidth', 1.5);
 grid on;
+ylim([-270 270])
 xlabel('Frequency (Hz)');
-ylabel('Phase (°)');
-title('Frequency Response Function - Phase');
+ylabel('Phase (rad)');
+
+%% Points 3 and 4 Modal Identification
+
+% Add points depending on preferences
+points = [[500, 200]; [400,300]; [150,500]];
+n_samples = length(points);
+FRFs = zeros(n_samples, F_resp_size);
+f_ranges = {};
+
+for k=1:n_samples
+    [FRFs(k,:), f_ranges{k}] = freq_resp(phi_matrix, w_nat, points(k,1), points(k,2), m, zeta_i, x, f1, f2, F_resp_size);
+end
+
+% Initial guesses
+w_guess = 28;
+zeta_guess = 0.01;
+A_guess = 0.08;
+Rl_guess = 0;
+Rh_guess = 0;
+
+p0 = [w_guess, zeta_guess, A_guess, Rl_guess, Rh_guess];
+
+% Options for the solver (optional)
+opts = optimoptions('lsqnonlin', 'Display', 'iter');
+
+% Estimate Parameters
+f1 = 4; %Hz
+f2 = 5; %Hz
+p_est = lsqnonlin(@(p) errfunc(FRFs, f1, f2, F_resp, p), p0, [], [], opts);
+
+w_i_est    = p_est(1);
+zeta_i_est = p_est(2);
+A_i_est    = p_est(3);
+Rl_est     = p_est(4);
+Rh_est     = p_est(5);
+
+[~, idx_f1] = min(abs(F_resp - f1));
+[~, idx_f2] = min(abs(F_resp - f2));
+
+Gnum = [];
+
+for f = F_resp
+    omega = 2*pi*f;
+    Gnum(end+1) = freq_resp_numerical(omega, w_i_est, zeta_i_est, A_i_est, ...
+        Rl_est, Rh_est);
+end
+
+
+% Plot magnitude
+figure;
+semilogy(F_resp, FRF_magnitude, 'b', 'LineWidth', 1.5);
+grid on;
+hold on;
+%semilogy(F_resp, abs(Gnum),'or');
+semilogy(F_resp(idx_f1:idx_f2), abs(Gnum(idx_f1:idx_f2)),'or');
+xlabel('Frequency (Hz)');
+ylabel('|G| (m/N)');
+title('Magnitude Estimation');
+
+
+% Plot phase
+figure
+plot(F_resp, FRF_phase, 'r', 'LineWidth', 1.5);
+grid on;
+hold on;
+%plot(F_resp, rad2deg(angle(Gnum)),'or');
+plot(F_resp(idx_f1:idx_f2), rad2deg(angle(Gnum(idx_f1:idx_f2))),'or');
+ylim([-270 270])
+xlabel('Frequency (Hz)');
+ylabel('Phase (rad)');
+title('Phase Estimation');
+
+
+
+%% Annex: Functions
+function [Gexp, F_resp] = freq_resp(phi_matrix, w_nat, pos_i, pos_k, m, ...
+                            zeta_i, x, f1, f2, F_resp_size)
+    Gexp = [];
+    j = sqrt(-1);
+    F_resp = linspace(f1, f2, F_resp_size);
+    n_modes = length(w_nat);
+    
+    for f = F_resp
+        sum = 0;
+        for i=1:n_modes
+            m_i = trapz(x, m.*phi_matrix(:,i).^2);
+            omega = f*2*pi;
+            w_i =  w_nat(i);
+            sum = sum + (phi_matrix(pos_i,i)*phi_matrix(pos_k,i)/m_i)/( ...
+                -omega^2 + j*2*zeta_i*w_i*omega + w_i^2);
+        end
+        
+        Gexp(end+1) = sum;
+    end
+    
+end
+
+function Gnum = freq_resp_numerical(omega, w_i, zeta_i, A_i, Rl, Rh)
+    i = sqrt(-1);
+    resonant = A_i/(-omega^2 + i*2*zeta_i*w_i*omega + w_i^2);
+    low_freq = Rl/omega^2;
+    high_freq = Rh;
+
+    Gnum = resonant + low_freq + high_freq;
+end
+
+function epsilon = errfunc(FRFs, f1, f2, F_resp, p)
+    w_i    = p(1);
+    zeta_i = p(2);
+    A_i    = p(3);
+    Rl     = p(4);
+    Rh     = p(5);
+
+    [~, idx_f1] = min(abs(F_resp - f1));
+    [~, idx_f2] = min(abs(F_resp - f2));
+
+    F = F_resp(idx_f1:idx_f2);
+
+    n = length(FRFs(:,1)');  % Number of known data points
+    m = length(F);  % Number of frequency points
+    
+
+    epsilon = zeros(2 * n * m, 1);
+    idx = 1;
+
+    for r = 1:n
+        Gexp = FRFs(r,:);
+        for f = F
+            [~, pos] = min(abs(F_resp - f));
+            omega = f*2*pi;
+            Gnum = freq_resp_numerical(omega, w_i, zeta_i, A_i, Rl, Rh);
+            
+            epsilon(idx)   = real(Gexp(pos) - Gnum);   % Real part
+            epsilon(idx+1) = imag(Gexp(pos) - Gnum);   % Imaginary part
+
+            % Update index for the next residual
+            idx = idx + 2;
+        end
+    end
+end
