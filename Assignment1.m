@@ -2,6 +2,9 @@ clc
 clear all
 close all
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PART A %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% PHYSICAL properties of the beam
 L  = 1200e-3; %m - length
 h  = 8e-3; %m thickness
@@ -59,7 +62,7 @@ hold on, grid on, xlabel('f [Hz]')
 
 plot(F(locs),abs(dets(locs)),'or')
 
-%% Find Mode Shapes
+%% Find Analytical Mode Shapes
 for i=1:length(w_nat)
    H_i = H(w_nat(i));
    H_ihat = H_i(2:end, 2:end );
@@ -76,6 +79,7 @@ xj_n = reshape(cell2mat(xj_n),4,[]);
 
 n_modes = length(w_nat);
 phi_matrix = zeros(length(x), n_modes);
+phi_matrix_normalized = zeros(length(x), n_modes);
 gamma = sqrt(w_nat)*c;
 
 figure(2)
@@ -87,9 +91,9 @@ for j=1:n_modes
    D = xj_n(4,j);
    
    phi_matrix(:,j) = A*cos(gamma(j)*x) + B*sin(gamma(j)*x) + C*cosh(gamma(j)*x) + D*sinh(gamma(j)*x);
-   phi_matrix(:,j) = phi_matrix(:,j)/max(abs(phi_matrix(:,j)));
+   phi_matrix_normalized(:,j) = phi_matrix(:,j)/max(abs(phi_matrix(:,j)));
 
-   plot(x, phi_matrix(:,j),'LineWidth',1.5);
+   plot(x, phi_matrix_normalized(:,j),'LineWidth',1.5);
    xlabel('Position (m)')
    ylabel('Displacement (m)')
    title('Normalized Mode Shapes')
@@ -98,7 +102,7 @@ for j=1:n_modes
 end
 
 
-%% Frequency Response
+%% Analytical Frequency Response
 
 % Set Parameters
 zeta_i = 0.01;
@@ -111,7 +115,7 @@ pos_i = 166;
 pos_k = 1000;
 
 % Compute Frequency Response
-[G, F_resp]  = freq_resp(phi_matrix, w_nat, pos_i, pos_k, m, zeta_i, x, ...
+[G, F_resp]  = freq_resp(phi_matrix_normalized, w_nat, pos_i, pos_k, m, zeta_i, x, ...
                          f1, f2, F_resp_size);
 
 % Compute magnitude and phase
@@ -135,21 +139,24 @@ ylim([-270 270])
 xlabel('Frequency (Hz)');
 ylabel('Phase (rad)');
 
-%% Points 3 and 4 Modal Identification
+%% Modal Identification
 
-% Add points depending on preferences
-points = [[166, 1000]; [400,1000]; [777, 1000]; [1000, 1000]];
+% Add points depending on preferences, need to change how to implement it
+% for given data set in part B
+points = [[166, 1000]; [400,1000]; [777, 1000]];
 n_samples = length(points);
 FRFs = zeros(n_samples, F_resp_size);
 f_ranges = {};
 
+% "Experimental" frequency responses
 for k=1:n_samples
-    [FRFs(k,:), f_ranges{k}] = freq_resp(phi_matrix, w_nat, points(k,1), points(k,2), m, zeta_i, x, f1, f2, F_resp_size);
+    [FRFs(k,:), f_ranges{k}] = freq_resp(phi_matrix_normalized, w_nat, points(k,1), points(k,2), m, zeta_i, x, f1, f2, F_resp_size);
 end
 
 % Initial guesses (may change implementation)
 % These are independent of n_samples
-w_guess = 28;
+mode_number = 3;
+w_guess = 500;
 zeta_guess = 0.01;
 
 % These are 1 per sample
@@ -161,8 +168,8 @@ p1 = repmat([A_guess, Rl_guess, Rh_guess], 1, n_samples);
 p0 = [w_guess, zeta_guess, p1];
 
 % Estimate Parameters
-f1 = 0.01; %Hz
-f2 = 15; %Hz
+f1 = 50; %Hz
+f2 = 120; %Hz
 p_est = lsqnonlin(@(p) errfunc(FRFs, f1, f2, F_resp, p), p0, [], [], []);
 
 f1 = 4;
@@ -201,10 +208,10 @@ semilogy(F_resp, FRF_magnitude, 'b', 'LineWidth', 1.5);
 grid on;
 hold on;
 %semilogy(F_resp, abs(Gnum),'or');
-semilogy(F_resp(idx_f1:idx_f2), abs(Gnum_1(idx_f1:idx_f2)),'or');
+semilogy(F_resp, abs(Gnum_1),'or');
 xlabel('Frequency (Hz)');
-xlim([3 6]);
-ylim([1e-4 1e-1]);
+%xlim([3 6]);
+%ylim([1e-4 1e-1]);
 ylabel('|G| (m/N)');
 title('Magnitude Estimation');
 
@@ -215,10 +222,10 @@ plot(F_resp, FRF_phase, 'LineWidth', 1.5);
 grid on;
 hold on;
 %plot(F_resp, rad2deg(angle(Gnum)),'or');
-plot(F_resp(idx_f1:idx_f2), rad2deg(angle(-Gnum_1(idx_f1:idx_f2))),'or');
+plot(F_resp, rad2deg(angle(-Gnum_1)),'or');
 ylim([-270 270])
 xlabel('Frequency (Hz)');
-xlim([3 6]);
+%xlim([3 6]);
 ylabel('Phase (rad)');
 title('Phase Estimation');
 
@@ -229,22 +236,89 @@ title('Phase Estimation');
 
 A1_est = p_est(3:3:end);
 phi_exp = real(A1_est);
-phi_exp_norm = phi_exp / max(abs(phi_exp));
+
+% Find maximum experimental value and corresponding index
+[max_val, max_pos] = max(A1_est);
+max_idx = points(max_pos, 1);
+
+% Normalize Experimental Mode Shape
+phi_exp_norm = phi_exp/max_val;
 
 x_positions = points(:,1).*dx;
 
 figure;
-plot(x, phi_matrix(:,1),'LineWidth',1.5);
+plot(x, (-phi_matrix(:,mode_number)/phi_matrix(max_idx, mode_number)),'LineWidth',1.5);
 hold on;
 grid on;
-plot(x_positions, -phi_exp_norm, 'o-', 'DisplayName', 'Experimental');
+plot(x_positions, -phi_exp_norm, 'or', 'DisplayName', 'Experimental');
 xlabel('Position (m)');
 ylabel('Displacement');
+legend('Model', 'Identified');
 title('Mode Shape Comparison');
 
+%% part b start
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PART B %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Load Experimental Data
+load('Data.mat');
 
 
+% Plot Experimental Data
+n_samples = length(frf(1,:));
+legendEntries = strings(1, n_samples);
 
+figure
+grid on;
+for i = 1:n_samples
+    subplot(3,1,1);
+    semilogy(freq, abs(frf(:,i)), 'LineWidth', 1.25);
+    ylabel('Amplitude (m/s^2/N)');
+    ylim([1e-4 2]);
+    hold on;
+
+    subplot(3,1,2);
+    plot(freq, rad2deg(angle(frf(:,i))), 'LineWidth', 1.25);
+    ylabel('Phase (°)');
+    ylim([-180 180]);
+    hold on;
+
+    subplot(3,1,3);
+    plot(freq, cohe(:,i), 'LineWidth', 1.25);
+    xlabel('Frequency (Hz)');
+    ylabel('Coherence (-)');
+    ylim([0 1]);
+
+    legendEntries(i) = sprintf('%d', i);
+    hold on;
+end
+legend(legendEntries);
+
+% This is because we treated measurements as rows instead of columns when
+% making functions
+frf = frf';
+
+%% Experimental Modal Analysis
+
+% Initial guesses (may change implementation)
+% These are independent of n_samples
+w_guess = 2*pi*667
+zeta_guess = 0.01;
+
+% These are 1 per sample
+A_guess = 0.08;
+Rl_guess = 0;
+Rh_guess = 0;
+
+p1 = repmat([A_guess, Rl_guess, Rh_guess], 1, n_samples);
+p0 = [w_guess, zeta_guess, p1];
+
+% Estimate Parameters
+f1 = 0.01; %Hz
+f2 = 1000; %Hz
+opts = optimoptions('lsqnonlin', 'Display', 'iter');
+%p_est = lsqnonlin(@(p) errfunc(frf, f1, f2, F_resp, p), p0, [], [], opts);
 
 
 %% Annex: Functions
