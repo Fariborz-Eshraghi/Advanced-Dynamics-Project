@@ -106,8 +106,8 @@ end
 
 % Set Parameters
 zeta_i = 0.01;
-f1 = 1;
-f2 = 200;
+f1 = fmin + df;
+f2 = fmax;
 F_resp_size = 10000;
 
 % indices over the span of vector x ([0, 1000])
@@ -155,12 +155,13 @@ end
 
 % Initial guesses (may change implementation)
 % These are independent of n_samples
-mode_number = 3;
-w_guess = 500;
-zeta_guess = 0.01;
+'MODAL IDENTIFICATION: Initial Guesses'
+mode_number = input('Which mode are you trying to identify?\n n = ');
+w_guess = input('Initial guess for natural frequency (Hz):\n w_guess = ')*2*pi;
+zeta_guess = input('Initial guess for damping ratio (0-1 values):\n zeta_guess = ');
 
 % These are 1 per sample
-A_guess = 0.08;
+A_guess = input('Initial Guess for Resonance Gain:\n A_guess = ');
 Rl_guess = 0;
 Rh_guess = 0;
 
@@ -168,21 +169,23 @@ p1 = repmat([A_guess, Rl_guess, Rh_guess], 1, n_samples);
 p0 = [w_guess, zeta_guess, p1];
 
 % Estimate Parameters
-f1 = 50; %Hz
-f2 = 120; %Hz
+f1 = input('Lower Frequency (Hz) for estimation:\n f1 = '); %Hz
+f2 = input('Upper Frequency (Hz) for estimation:\n f2 = '); %Hz
 p_est = lsqnonlin(@(p) errfunc(FRFs, f1, f2, F_resp, p), p0, [], [], []);
 
-f1 = 4;
-f2 = 5;
+% Estimated w_nat and zeta
+w_i_est    = p_est(1);
+zeta_i_est = p_est(2);
+
+fprintf("Estimated Natural frequency Value for Mode %d:\n %d rad/s\n %d Hz\n", mode_number, w_i_est, w_i_est/(2*pi));
+
+f1 = input('Lower Frequency (Hz) for plot:\n f1_plot = '); %Hz
+f2 = input('Upper Frequency (Hz) for plot:\n f2_plot = '); %Hz
 [~, idx_f1] = min(abs(F_resp - f1));
 [~, idx_f2] = min(abs(F_resp - f2));
 
 Gnum = zeros(1, length(F_resp));
 Gnum_jk = zeros(n_samples, length(F_resp));
-
-% Estimated w_nat and zeta
-w_i_est    = p_est(1);
-zeta_i_est = p_est(2);
 
 for f = 1:length(F_resp)
     freq = F_resp(f);
@@ -201,6 +204,7 @@ for f = 1:length(F_resp)
 end
 
 Gnum_1 = Gnum_jk(1,:);
+Gnum_1 = Gnum_1(idx_f1:idx_f2);
 
 % Plot magnitude for point 1
 figure;
@@ -208,7 +212,7 @@ semilogy(F_resp, FRF_magnitude, 'b', 'LineWidth', 1.5);
 grid on;
 hold on;
 %semilogy(F_resp, abs(Gnum),'or');
-semilogy(F_resp, abs(Gnum_1),'or');
+semilogy(F_resp(idx_f1:idx_f2), abs(Gnum_1),'or');
 xlabel('Frequency (Hz)');
 %xlim([3 6]);
 %ylim([1e-4 1e-1]);
@@ -222,7 +226,7 @@ plot(F_resp, FRF_phase, 'LineWidth', 1.5);
 grid on;
 hold on;
 %plot(F_resp, rad2deg(angle(Gnum)),'or');
-plot(F_resp, rad2deg(angle(-Gnum_1)),'or');
+plot(F_resp(idx_f1:idx_f2), rad2deg(angle(-Gnum_1)),'or');
 ylim([-270 270])
 xlabel('Frequency (Hz)');
 %xlim([3 6]);
@@ -303,7 +307,7 @@ frf = frf';
 
 % Initial guesses (may change implementation)
 % These are independent of n_samples
-w_guess = 2*pi*667
+w_guess = 2*pi*667;
 zeta_guess = 0.01;
 
 % These are 1 per sample
