@@ -40,10 +40,7 @@ for i = 1 : 12
 end
 
 
-Omega1 = 660;
-Omega2 = 1600;
-
-
+%% Calculating the estimated part
 % Add points depending on preferences
 points = frf;
 F_resp = d.freq;
@@ -56,7 +53,7 @@ FRFs = points.';
 
 % Initial guesses (may change implementation)
 % These are independent of n_samples
-fnGuess   = Omega1;                % Hz
+fnGuess   = [660, 1600];                % Hz
 w_guess   = 2*pi*fnGuess;        % rad/s
 
 zeta_guess = 0.01;
@@ -66,51 +63,56 @@ A_guess = 0.08;
 Rl_guess = 0;
 Rh_guess = 0;
 
+
 p1 = repmat([A_guess, Rl_guess, Rh_guess], 1, n_samples);
-p0 = [w_guess, zeta_guess, p1];
+for i=1: 2; p0(i, :) = [w_guess(i), zeta_guess, p1]; end;
 
 % Estimate Parameters
-f1 = 1; %Hz
-f2 = 1000; %Hz
-% p_est = lsqnonlin(@(p) errfunc(FRFs, f1, f2, F_resp, p), p0, [], [], []);
+f1 = [1, 1200]; % Hz
+f2 = [1000, 2300]; % Hz
 
-nPar = numel(p0);
-lb   = -Inf(1,nPar);      ub =  Inf(1,nPar);   % full length
+for i=1: 2; nPar (i) = numel(p0(i, :)); end;
+lb   = -Inf(1,nPar(1));      ub =  Inf(1,nPar(1));   % full length
 lb(1) =   0;              ub(1) =  Inf;        % w_i  ≥ 0
 lb(2) =   0;              ub(2) =  0.30;       % 0  ≤ ζ ≤ 0.30 (example)
 
 opts = optimoptions('lsqnonlin','Display','iter');
-p_est = lsqnonlin(@(p)errfunc(FRFs,f1,f2,F_resp,p), ...
-                  p0, lb, ub, opts);
+for i= 1: 2; p_est(i, :) = lsqnonlin(@(p)errfunc(FRFs,f1(i) ,f2(i) ,F_resp,p), ...
+                  p0 (i, :), lb, ub, opts); end;
 
+%% From here
+clc;
+Gnum_jki = {};
 
+for i =1: 2
 % Searching for the closest frequency points to the margines
-[~, idx_f1] = min(abs(F_resp - f1));
-[~, idx_f2] = min(abs(F_resp - f2));
+[~, idx_f1(i)] = min(abs(F_resp - f1(i)));
+[~, idx_f2(i)] = min(abs(F_resp - f2(i)));
 
 Gnum = zeros(1, length(F_resp));
-Gnum_jk = zeros(n_samples, length(F_resp));
+% Gnum_jk = zeros(n_samples, length(F_resp));
 
 % Estimated w_nat and zeta
-w_i_est    = p_est(1);
-zeta_i_est = p_est(2);
+    w_i_est    = p_est(i, 1);
+    zeta_i_est = p_est(i, 2);
+    Gnum_jk = zeros(n_samples, length(F_resp));
 
-for f = 1:length(F_resp)
-    freq = F_resp(f);
-    omega = 2*pi*freq;
-    for idx_r = 1:n_samples
-        r = 3 + 3*(idx_r-1);
-        % Sample dependent parameters
-        A_i_est    = p_est(r);
-        Rl_est     = p_est(r+1);
-        Rh_est     = p_est(r+2);
-
-        Gnum_jk(idx_r, f) = Gnum_jk(idx_r, f) + freq_resp_numerical (omega, w_i_est, zeta_i_est, A_i_est, ...
-        Rl_est, Rh_est);
+    for f = 1:length(F_resp)
+        freq = F_resp(f);
+        omega = 2*pi*freq;
+        for idx_r = 1:n_samples
+            r = 3 + 3*(idx_r-1);
+            % Sample dependent parameters
+            A_i_est(i)   = p_est(i, r);
+            Rl_est(i)    = p_est(i, r+1);
+            Rh_est(i)    = p_est(i, r+2);
+    
+            Gnum_jk(idx_r, f) = Gnum_jk(idx_r, f) + freq_resp_numerical (omega, w_i_est(i, :), zeta_i_est(i, :), A_i_est(i, :), ...
+            Rl_est(i), Rh_est(i));
+        end
     end
- 
+    Gnum_jki {i} = Gnum_jk;
 end
-
 
 %% 2) Check the quality of the identification comparing the identified FRFs and the experimental ones.
 
@@ -160,8 +162,29 @@ for i = 13: 24; theta (i) = 15 * (2*pi/360) *(i); end   % Defining the mirrored 
 for i = 1: 12; rho1 (i) = p_est (3*i); end           % Having the A values!
 M = max (abs(rho1));
 rho2 = rho1./M; % Normilizing by the maximum one
-rho = [rho2, flip(rho2)]; % Mirroring the numbers
-polarplot (theta,rho);
+rho3 = [rho2, flip(rho2)]; % Mirroring the numbers
+rho = rho3 + 10*ones(size(theta));
+polarplot (theta,rho);     % Ploting the diagram
+
+hold on; % Adding the 
+% Add a dashed line to show the reference zero point
+polarplot(theta, 10*ones(size(theta)), 'k--', 'LineWidth', 1);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 %% Annex: Functions
