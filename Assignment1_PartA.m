@@ -52,7 +52,7 @@ end
 
 
 %% Find Natural Frequencies
-[pks, locs] = findpeaks(-abs(dets), 'MinPeakProminence',1);
+[pks, locs] = findpeaks(-abs(dets), 'MinPeakProminence',0.1);
 f_nat = locs.*df;
 w_nat = locs.*df.*2*pi;
 
@@ -143,7 +143,7 @@ ylabel('Phase (rad)');
 
 % Add points depending on preferences, need to change how to implement it
 % for given data set in part B
-points = [[166, 1000]; [400,1000]; [777, 1000]];
+points = [[166, 1000]; [400, 1000]; [600, 1000]; [950, 1000]];
 n_samples = length(points);
 FRFs = zeros(n_samples, F_resp_size);
 f_ranges = {};
@@ -177,12 +177,9 @@ p_est = lsqnonlin(@(p) errfunc(FRFs, f1, f2, F_resp, p), p0, [], [], []);
 w_i_est    = p_est(1);
 zeta_i_est = p_est(2);
 
-fprintf("Estimated Natural frequency Value for Mode %d:\n %d rad/s\n %d Hz\n", mode_number, w_i_est, w_i_est/(2*pi));
+fprintf("Estimated Natural frequency Value for Mode %d: %.2f rad/s (%.2f Hz)\n", mode_number, w_i_est, w_i_est/(2*pi));
+fprintf("Estimated damping ratio for Mode %d: zeta = %.2f\n", mode_number, zeta_i_est);
 
-f1 = input('Lower Frequency (Hz) for plot:\n f1_plot = '); %Hz
-f2 = input('Upper Frequency (Hz) for plot:\n f2_plot = '); %Hz
-[~, idx_f1] = min(abs(F_resp - f1));
-[~, idx_f2] = min(abs(F_resp - f2));
 
 Gnum = zeros(1, length(F_resp));
 Gnum_jk = zeros(n_samples, length(F_resp));
@@ -204,7 +201,24 @@ for f = 1:length(F_resp)
 end
 
 Gnum_1 = Gnum_jk(1,:);
-Gnum_1 = Gnum_1(idx_f1:idx_f2);
+%Gnum_1 = Gnum_1(idx_f1:idx_f2);
+
+w = w_i_est;
+f_search = w/(2*pi);
+
+[~, idx_w_nat] = min(abs(F_resp - f_search));
+marg = 500;
+if idx_w_nat - marg < 1
+    idx_f1 = 1;
+else
+    idx_f1 = idx_w_nat - marg;
+end
+
+if idx_w_nat + marg > length(F_resp)
+    idx_f2 = F_resp(end);
+else
+    idx_f2 = idx_w_nat + marg;
+end
 
 % Plot magnitude for point 1
 figure;
@@ -212,7 +226,7 @@ semilogy(F_resp, FRF_magnitude, 'b', 'LineWidth', 1.5);
 grid on;
 hold on;
 %semilogy(F_resp, abs(Gnum),'or');
-semilogy(F_resp(idx_f1:idx_f2), abs(Gnum_1),'or');
+semilogy(F_resp(idx_f1:idx_f2), abs(Gnum_1(idx_f1:idx_f2)),'or');
 xlabel('Frequency (Hz)');
 %xlim([3 6]);
 %ylim([1e-4 1e-1]);
@@ -226,7 +240,7 @@ plot(F_resp, FRF_phase, 'LineWidth', 1.5);
 grid on;
 hold on;
 %plot(F_resp, rad2deg(angle(Gnum)),'or');
-plot(F_resp(idx_f1:idx_f2), rad2deg(angle(-Gnum_1)),'or');
+plot(F_resp(idx_f1:idx_f2), rad2deg(angle(-Gnum_1(idx_f1:idx_f2))),'or');
 ylim([-270 270])
 xlabel('Frequency (Hz)');
 %xlim([3 6]);
@@ -260,71 +274,6 @@ ylabel('Displacement');
 legend('Model', 'Identified');
 title('Mode Shape Comparison');
 
-%% part b start
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PART B %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Load Experimental Data
-load('Data.mat');
-
-
-% Plot Experimental Data
-n_samples = length(frf(1,:));
-legendEntries = strings(1, n_samples);
-
-figure
-grid on;
-for i = 1:n_samples
-    subplot(3,1,1);
-    semilogy(freq, abs(frf(:,i)), 'LineWidth', 1.25);
-    ylabel('Amplitude (m/s^2/N)');
-    ylim([1e-4 2]);
-    hold on;
-
-    subplot(3,1,2);
-    plot(freq, rad2deg(angle(frf(:,i))), 'LineWidth', 1.25);
-    ylabel('Phase (°)');
-    ylim([-180 180]);
-    hold on;
-
-    subplot(3,1,3);
-    plot(freq, cohe(:,i), 'LineWidth', 1.25);
-    xlabel('Frequency (Hz)');
-    ylabel('Coherence (-)');
-    ylim([0 1]);
-
-    legendEntries(i) = sprintf('%d', i);
-    hold on;
-end
-legend(legendEntries);
-
-% This is because we treated measurements as rows instead of columns when
-% making functions
-frf = frf';
-
-%% Experimental Modal Analysis
-
-% Initial guesses (may change implementation)
-% These are independent of n_samples
-w_guess = 2*pi*667;
-zeta_guess = 0.01;
-
-% These are 1 per sample
-A_guess = 0.08;
-Rl_guess = 0;
-Rh_guess = 0;
-
-p1 = repmat([A_guess, Rl_guess, Rh_guess], 1, n_samples);
-p0 = [w_guess, zeta_guess, p1];
-
-% Estimate Parameters
-f1 = 0.01; %Hz
-f2 = 1000; %Hz
-opts = optimoptions('lsqnonlin', 'Display', 'iter');
-%p_est = lsqnonlin(@(p) errfunc(frf, f1, f2, F_resp, p), p0, [], [], opts);
-
-
 %% Annex: Functions
 function [Gexp, F_resp] = freq_resp(phi_matrix, w_nat, pos_i, pos_k, m, ...
                             zeta_i, x, f1, f2, F_resp_size)
@@ -348,7 +297,7 @@ function [Gexp, F_resp] = freq_resp(phi_matrix, w_nat, pos_i, pos_k, m, ...
     
 end
 
-function Gnum = freq_resp_numerical(omega, w_i, zeta_i, A_i, Rl, Rh)
+function Gnum = freq_resp_numerical(omega, w_i, zeta_i, A_i, Rl, Rh)    
     i = sqrt(-1);
     resonant = A_i/(-omega^2 + i*2*zeta_i*w_i*omega + w_i^2);
     low_freq = Rl/omega^2;
@@ -358,39 +307,48 @@ function Gnum = freq_resp_numerical(omega, w_i, zeta_i, A_i, Rl, Rh)
 end
 
 function epsilon = errfunc(FRFs, f1, f2, F_resp, p)
-    n = length(FRFs(:,1)');  % Number of sampled FRFs
+    n = size(FRFs, 1);  % Number of sampled FRFs (rows)
 
+    % Frequency range indices
     [~, idx_f1] = min(abs(F_resp - f1));
     [~, idx_f2] = min(abs(F_resp - f2));
 
-    F = F_resp(idx_f1:idx_f2);
-    m = length(F);  % Number of frequency points
-    
-    % Estimated w_nat and zeta
+    F = F_resp(idx_f1:idx_f2);  % Frequency vector in selected range
+    m = length(F);              % Number of frequency points in range
+
+    % Estimated global parameters
     w_i    = p(1);
     zeta_i = p(2);
 
+    % Preallocate residual vector
     epsilon = zeros(2 * n * m, 1);
     idx = 1;
 
     for idx_r = 1:n
-        r = 3 + 3*(idx_r-1);
-        Gexp = FRFs(idx_r,:);
-        
-        % Sample dependent parameters
-        A_i    = p(r);
-        Rl     = p(r+1);
-        Rh     = p(r+2);
-        for f = F
-            [~, pos] = min(abs(F_resp - f));
-            omega = f*2*pi;
-            Gnum = freq_resp_numerical(omega, w_i, zeta_i, A_i, Rl, Rh);
-            
-            epsilon(idx)   = real(Gexp(pos) - Gnum);   % Real part
-            epsilon(idx+1) = imag(Gexp(pos) - Gnum);   % Imaginary part
+        r = 3 + 3*(idx_r - 1);
 
-            % Update index for the next residual
+        % Extract sample-specific parameters
+        A_i = p(r);
+        Rl  = p(r + 1);
+        Rh  = p(r + 2);
+
+        % Extract and slice experimental FRF
+        Gexp = FRFs(idx_r, idx_f1:idx_f2);
+        scale = max(abs(Gexp));  % or norm(Gexp)
+
+        for kk = 1:m
+            f = F(kk);
+            omega = 2 * pi * f;
+
+            Gnum = freq_resp_numerical(omega, w_i, zeta_i, A_i, Rl, Rh);
+
+            epsilon(idx)   = real(Gexp(kk) - Gnum)/scale;
+            epsilon(idx+1) = imag(Gexp(kk) - Gnum)/scale;
+
             idx = idx + 2;
         end
     end
 end
+
+
+
