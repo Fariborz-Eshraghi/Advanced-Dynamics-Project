@@ -1,0 +1,371 @@
+{
+  "verFile": "0.4.0.0",
+  "drawingDataExtractor": {
+    "settings": {
+      "fileList": {
+        "folders": {},
+        "files": {
+          "c:\\users\\alter\\onedrive\\copias seguridad acer 2025\\onedrive\\acer 2025 copias seguridad\\escritorio\\assignment2_fem.dwg": {
+            "original": "C:\\Users\\alter\\OneDrive\\Copias Seguridad Acer 2025\\OneDrive\\ACER 2025 COPIAS SEGURIDAD\\Escritorio\\Assignment2_FEM.dwg",
+            "absolute": "C:\\Users\\alter\\OneDrive\\Copias Seguridad Acer 2025\\OneDrive\\ACER 2025 COPIAS SEGURIDAD\\Escritorio\\Assignment2_FEM.dwg",
+            "special": "\u003CDesktop\u003E\\assignment2_fem.dwg",
+            "relative": "..\\..\\..\\..\\..\\..\\..\\Assignment2_FEM.dwg",
+            "environment": "",
+            "time": "2025-05-13T22:23:36Z",
+            "$type": "Autodesk.AutoCAD.DataExtraction.DxFileReference"
+          }
+        },
+        "xRefFiles": {},
+        "currentFile": {
+          "original": "C:\\Users\\alter\\OneDrive\\Copias Seguridad Acer 2025\\OneDrive\\ACER 2025 COPIAS SEGURIDAD\\Escritorio\\Assignment2_FEM.dwg",
+          "absolute": "C:\\Users\\alter\\OneDrive\\Copias Seguridad Acer 2025\\OneDrive\\ACER 2025 COPIAS SEGURIDAD\\Escritorio\\Assignment2_FEM.dwg",
+          "special": "\u003CDesktop\u003E\\assignment2_fem.dwg",
+          "relative": ".\\Assignment2_FEM.dwg",
+          "environment": "",
+          "time": "2025-05-13T22:23:36Z",
+          "$type": "Autodesk.AutoCAD.DataExtraction.DxFileReference"
+        },
+        "$type": "Autodesk.AutoCAD.DataExtraction.DxFileList"
+      },
+      "selectedTypesAndProperties": [
+        {
+          "type": "Autodesk.AutoCAD.DatabaseServices.Line, Acdbmgd, Version=25.0.0.0, Culture=neutral, PublicKeyToken=null",
+          "props": {
+            "AcDxObjectTypeGlobalName": {
+              "typeName": "Autodesk.AutoCAD.DatabaseServices.DBObject, Acdbmgd, Version=25.0.0.0, Culture=neutral, PublicKeyToken=null",
+              "propName": "AcDxObjectTypeGlobalName",
+              "displayName": "Name",
+              "propValueType": "System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
+              "unitType": 0,
+              "$type": "Autodesk.AutoCAD.DataExtraction.DxPropertyDescriptor"
+            },
+            "AcDxObjectTypeName": {
+              "typeName": "Autodesk.AutoCAD.DatabaseServices.DBObject, Acdbmgd, Version=25.0.0.0, Culture=neutral, PublicKeyToken=null",
+              "propName": "AcDxObjectTypeName",
+              "displayName": "Name",
+              "propValueType": "System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e",
+              "unitType": 0,
+              "$type": "Autodesk.AutoCAD.DataExtraction.DxPropertyDescriptor"
+            },
+            "EndPoint.X": {
+              "typeName": "Autodesk.AutoCAD.DatabaseServices.Line, Acdbmgd, Version=25.0.0.0, Culture=neutral, PublicKeyToken=null",
+              "propName": "EndPoint",
+              "displayName": "End X",
+              "propValueType": "Autodesk.AutoCAD.Geometry.Point3d, Acdbmgd, Version=25.0.0.0, Culture=neutral, PublicKeyToken=null",
+              "unitType": 1,
+              "SubPropertyName": "X",
+              "$type": "Autodesk.AutoCAD.DataExtraction.DxSubPropertyDescriptor"
+            },
+            "EndPoint.Y": {
+              "typeName": "Autodesk.AutoCAD.DatabaseServices.Line, Acdbmgd, Version=25.0.0.0, Culture=neutral, PublicKeyToken=null",
+              "propName": "EndPoint",
+              "displayName": "End Y",
+              "propValueType": "Autodesk.AutoCAD.Geometry.Point3d, Acdbmgd, Version=25.0.0.0, Culture=neutral, PublicKeyToken=null",
+              "unitType": 1,
+              "SubPropertyName": "Y",
+              "$type": "Autodesk.AutoCAD.DataExtraction.DxSubPropertyDescriptor"
+            },
+            "StartPoint.X": {
+              "typeName": "Autodesk.AutoCAD.DatabaseServices.Line, Acdbmgd, Version=25.0.0.0, Culture=neutral, PublicKeyToken=null",
+              "propName": "StartPoint",
+              "displayName": "Start X",
+              "propValueType": "Autodesk.AutoCAD.Geometry.Point3d, Acdbmgd, Version=25.0.0.0, Culture=neutral, PublicKeyToken=null",
+              "unitType": 1,
+              "SubPropertyName": "X",
+              "$type": "Autodesk.AutoCAD.DataExtraction.DxSubPropertyDescriptor"
+            },
+            "StartPoint.Y": {
+              "typeName": "Autodesk.AutoCAD.DatabaseServices.Line, Acdbmgd, Version=25.0.0.0, Culture=neutral, PublicKeyToken=null",
+              "propName": "StartPoint",
+              "displayName": "Start Y",
+              "propValueType": "Autodesk.AutoCAD.Geometry.Point3d, Acdbmgd, Version=25.0.0.0, Culture=neutral, PublicKeyToken=null",
+              "unitType": 1,
+              "SubPropertyName": "Y",
+              "$type": "Autodesk.AutoCAD.DataExtraction.DxSubPropertyDescriptor"
+            }
+          },
+          "displayName": "Line",
+          "inUse": true,
+          "$type": "Autodesk.AutoCAD.DataExtraction.DxTypeDescriptor"
+        }
+      ],
+      "selectedObjectHandles": [
+        974,
+        975,
+        977,
+        978,
+        980,
+        981,
+        1083,
+        1084,
+        1085,
+        1086,
+        1087,
+        1088,
+        1089,
+        1090
+      ],
+      "extractFlags": 5,
+      "BlockNameToImageMap": {},
+      "$type": "Autodesk.AutoCAD.DataExtraction.DxDrawingDataExtractorSettings"
+    },
+    "$type": "Autodesk.AutoCAD.DataExtraction.DxDrawingDataExtractor"
+  },
+  "report": {
+    "strSort": "",
+    "strFilter": "",
+    "nCheckSum": 0,
+    "bGroupMatchingRows": false,
+    "ColLists": [
+      {
+        "strGlobalName": "AcDxCount",
+        "strDisplayName": "Count",
+        "strFormula": null,
+        "strDisplayedFormula": null,
+        "strFilter": "",
+        "FormatInfo": {
+          "Format": null,
+          "DataType": 1,
+          "UnitType": 0,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "OriginalFormatInfo": {
+          "Format": null,
+          "DataType": 0,
+          "UnitType": 0,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "flags": 8,
+        "subTotalMode": 0,
+        "combineMode": 0,
+        "$type": "Autodesk.AutoCAD.DataExtraction.DxColumn2"
+      },
+      {
+        "strGlobalName": "AcDxHandleData",
+        "strDisplayName": "AcDxHandleData",
+        "strFormula": null,
+        "strDisplayedFormula": null,
+        "strFilter": "",
+        "FormatInfo": {
+          "Format": null,
+          "DataType": 4,
+          "UnitType": 0,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "OriginalFormatInfo": {
+          "Format": null,
+          "DataType": 4,
+          "UnitType": 0,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "flags": 16,
+        "subTotalMode": 0,
+        "combineMode": 0,
+        "$type": "Autodesk.AutoCAD.DataExtraction.DxColumn2"
+      },
+      {
+        "strGlobalName": "AcDxObjectTypeGlobalName",
+        "strDisplayName": "Name",
+        "strFormula": null,
+        "strDisplayedFormula": null,
+        "strFilter": "",
+        "FormatInfo": {
+          "Format": null,
+          "DataType": 4,
+          "UnitType": 0,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "OriginalFormatInfo": {
+          "Format": null,
+          "DataType": 4,
+          "UnitType": 0,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "flags": 16,
+        "subTotalMode": 0,
+        "combineMode": 0,
+        "$type": "Autodesk.AutoCAD.DataExtraction.DxColumn2"
+      },
+      {
+        "strGlobalName": "AcDxObjectTypeName",
+        "strDisplayName": "Name",
+        "strFormula": null,
+        "strDisplayedFormula": null,
+        "strFilter": "",
+        "FormatInfo": {
+          "Format": null,
+          "DataType": 4,
+          "UnitType": 0,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "OriginalFormatInfo": {
+          "Format": null,
+          "DataType": 4,
+          "UnitType": 0,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "flags": 1,
+        "subTotalMode": 0,
+        "combineMode": 0,
+        "$type": "Autodesk.AutoCAD.DataExtraction.DxColumn2"
+      },
+      {
+        "strGlobalName": "StartPoint.X",
+        "strDisplayName": "Start X",
+        "strFormula": null,
+        "strDisplayedFormula": null,
+        "strFilter": "",
+        "FormatInfo": {
+          "Format": "%lu6",
+          "DataType": 2,
+          "UnitType": 1,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "OriginalFormatInfo": {
+          "Format": "%lu6",
+          "DataType": 2,
+          "UnitType": 1,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "flags": 1,
+        "subTotalMode": 0,
+        "combineMode": 0,
+        "$type": "Autodesk.AutoCAD.DataExtraction.DxColumn2"
+      },
+      {
+        "strGlobalName": "StartPoint.Y",
+        "strDisplayName": "Start Y",
+        "strFormula": null,
+        "strDisplayedFormula": null,
+        "strFilter": "",
+        "FormatInfo": {
+          "Format": "%lu6",
+          "DataType": 2,
+          "UnitType": 1,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "OriginalFormatInfo": {
+          "Format": "%lu6",
+          "DataType": 2,
+          "UnitType": 1,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "flags": 1,
+        "subTotalMode": 0,
+        "combineMode": 0,
+        "$type": "Autodesk.AutoCAD.DataExtraction.DxColumn2"
+      },
+      {
+        "strGlobalName": "EndPoint.X",
+        "strDisplayName": "End X",
+        "strFormula": null,
+        "strDisplayedFormula": null,
+        "strFilter": "",
+        "FormatInfo": {
+          "Format": "%lu6",
+          "DataType": 2,
+          "UnitType": 1,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "OriginalFormatInfo": {
+          "Format": "%lu6",
+          "DataType": 2,
+          "UnitType": 1,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "flags": 1,
+        "subTotalMode": 0,
+        "combineMode": 0,
+        "$type": "Autodesk.AutoCAD.DataExtraction.DxColumn2"
+      },
+      {
+        "strGlobalName": "EndPoint.Y",
+        "strDisplayName": "End Y",
+        "strFormula": null,
+        "strDisplayedFormula": null,
+        "strFilter": "",
+        "FormatInfo": {
+          "Format": "%lu6",
+          "DataType": 2,
+          "UnitType": 1,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "OriginalFormatInfo": {
+          "Format": "%lu6",
+          "DataType": 2,
+          "UnitType": 1,
+          "$type": "Autodesk.AutoCAD.DataExtraction.FormatInfo"
+        },
+        "flags": 1,
+        "subTotalMode": 0,
+        "combineMode": 0,
+        "$type": "Autodesk.AutoCAD.DataExtraction.DxColumn2"
+      }
+    ],
+    "bMultiSorted": false,
+    "bInAggregateMode": true,
+    "MergeSettingList": null,
+    "ColumnDataTypes": [
+      {
+        "Data": "System.Int32"
+      },
+      {
+        "Data": "System.String"
+      },
+      {
+        "Data": "System.String"
+      },
+      {
+        "Data": "System.String"
+      },
+      {
+        "Data": "System.Double"
+      },
+      {
+        "Data": "System.Double"
+      },
+      {
+        "Data": "System.Double"
+      },
+      {
+        "Data": "System.Double"
+      }
+    ],
+    "tblForInvalidGlobal": {},
+    "reportTable": [
+      "\u003CNewDataSet\u003E\r\n  \u003Cxs:schema id=\u0022NewDataSet\u0022 xmlns=\u0022\u0022 xmlns:xs=\u0022http://www.w3.org/2001/XMLSchema\u0022 xmlns:msdata=\u0022urn:schemas-microsoft-com:xml-msdata\u0022\u003E\r\n    \u003Cxs:element name=\u0022NewDataSet\u0022 msdata:IsDataSet=\u0022true\u0022 msdata:MainDataTable=\u0022_x0024_table_name_x0024_\u0022 msdata:UseCurrentLocale=\u0022true\u0022\u003E\r\n      \u003Cxs:complexType\u003E\r\n        \u003Cxs:choice minOccurs=\u00220\u0022 maxOccurs=\u0022unbounded\u0022\u003E\r\n          \u003Cxs:element name=\u0022_x0024_table_name_x0024_\u0022\u003E\r\n            \u003Cxs:complexType\u003E\r\n              \u003Cxs:sequence\u003E\r\n                \u003Cxs:element name=\u0022Count\u0022 type=\u0022xs:int\u0022 minOccurs=\u00220\u0022 /\u003E\r\n                \u003Cxs:element name=\u0022Name\u0022 type=\u0022xs:string\u0022 minOccurs=\u00220\u0022 /\u003E\r\n                \u003Cxs:element name=\u0022Start_x0020_X\u0022 type=\u0022xs:string\u0022 minOccurs=\u00220\u0022 /\u003E\r\n                \u003Cxs:element name=\u0022Start_x0020_Y\u0022 type=\u0022xs:string\u0022 minOccurs=\u00220\u0022 /\u003E\r\n                \u003Cxs:element name=\u0022End_x0020_X\u0022 type=\u0022xs:string\u0022 minOccurs=\u00220\u0022 /\u003E\r\n                \u003Cxs:element name=\u0022End_x0020_Y\u0022 type=\u0022xs:string\u0022 minOccurs=\u00220\u0022 /\u003E\r\n              \u003C/xs:sequence\u003E\r\n            \u003C/xs:complexType\u003E\r\n          \u003C/xs:element\u003E\r\n        \u003C/xs:choice\u003E\r\n      \u003C/xs:complexType\u003E\r\n    \u003C/xs:element\u003E\r\n  \u003C/xs:schema\u003E\r\n  \u003C_x0024_table_name_x0024_\u003E\r\n    \u003CCount\u003E1\u003C/Count\u003E\r\n    \u003CName\u003ELine\u003C/Name\u003E\r\n    \u003CStart_x0020_X\u003E13.8092\u003C/Start_x0020_X\u003E\r\n    \u003CStart_x0020_Y\u003E2.8045\u003C/Start_x0020_Y\u003E\r\n    \u003CEnd_x0020_X\u003E11.4127\u003C/End_x0020_X\u003E\r\n    \u003CEnd_x0020_Y\u003E3.7082\u003C/End_x0020_Y\u003E\r\n  \u003C/_x0024_table_name_x0024_\u003E\r\n  \u003C_x0024_table_name_x0024_\u003E\r\n    \u003CCount\u003E1\u003C/Count\u003E\r\n    \u003CName\u003ELine\u003C/Name\u003E\r\n    \u003CStart_x0020_X\u003E13.8092\u003C/Start_x0020_X\u003E\r\n    \u003CStart_x0020_Y\u003E2.8045\u003C/Start_x0020_Y\u003E\r\n    \u003CEnd_x0020_X\u003E15.2169\u003C/End_x0020_X\u003E\r\n    \u003CEnd_x0020_Y\u003E4.9443\u003C/End_x0020_Y\u003E\r\n  \u003C/_x0024_table_name_x0024_\u003E\r\n  \u003C_x0024_table_name_x0024_\u003E\r\n    \u003CCount\u003E1\u003C/Count\u003E\r\n    \u003CName\u003ELine\u003C/Name\u003E\r\n    \u003CStart_x0020_X\u003E17.6134\u003C/Start_x0020_X\u003E\r\n    \u003CStart_x0020_Y\u003E4.0406\u003C/Start_x0020_Y\u003E\r\n    \u003CEnd_x0020_X\u003E15.2169\u003C/End_x0020_X\u003E\r\n    \u003CEnd_x0020_Y\u003E4.9443\u003C/End_x0020_Y\u003E\r\n  \u003C/_x0024_table_name_x0024_\u003E\r\n  \u003C_x0024_table_name_x0024_\u003E\r\n    \u003CCount\u003E1\u003C/Count\u003E\r\n    \u003CName\u003ELine\u003C/Name\u003E\r\n    \u003CStart_x0020_X\u003E17.6134\u003C/Start_x0020_X\u003E\r\n    \u003CStart_x0020_Y\u003E4.0406\u003C/Start_x0020_Y\u003E\r\n    \u003CEnd_x0020_X\u003E19.0211\u003C/End_x0020_X\u003E\r\n    \u003CEnd_x0020_Y\u003E6.1803\u003C/End_x0020_Y\u003E\r\n  \u003C/_x0024_table_name_x0024_\u003E\r\n  \u003C_x0024_table_name_x0024_\u003E\r\n    \u003CCount\u003E1\u003C/Count\u003E\r\n    \u003CName\u003ELine\u003C/Name\u003E\r\n    \u003CStart_x0020_X\u003E21.4177\u003C/Start_x0020_X\u003E\r\n    \u003CStart_x0020_Y\u003E5.2767\u003C/Start_x0020_Y\u003E\r\n    \u003CEnd_x0020_X\u003E19.0211\u003C/End_x0020_X\u003E\r\n    \u003CEnd_x0020_Y\u003E6.1803\u003C/End_x0020_Y\u003E\r\n  \u003C/_x0024_table_name_x0024_\u003E\r\n  \u003C_x0024_table_name_x0024_\u003E\r\n    \u003CCount\u003E1\u003C/Count\u003E\r\n    \u003CName\u003ELine\u003C/Name\u003E\r\n    \u003CStart_x0020_X\u003E21.4177\u003C/Start_x0020_X\u003E\r\n    \u003CStart_x0020_Y\u003E5.2767\u003C/Start_x0020_Y\u003E\r\n    \u003CEnd_x0020_X\u003E22.8254\u003C/End_x0020_X\u003E\r\n    \u003CEnd_x0020_Y\u003E7.4164\u003C/End_x0020_Y\u003E\r\n  \u003C/_x0024_table_name_x0024_\u003E\r\n  \u003C_x0024_table_name_x0024_\u003E\r\n    \u003CCount\u003E1\u003C/Count\u003E\r\n    \u003CName\u003ELine\u003C/Name\u003E\r\n    \u003CStart_x0020_X\u003E22.8254\u003C/Start_x0020_X\u003E\r\n    \u003CStart_x0020_Y\u003E7.4164\u003C/Start_x0020_Y\u003E\r\n    \u003CEnd_x0020_X\u003E25.2219\u003C/End_x0020_X\u003E\r\n    \u003CEnd_x0020_Y\u003E6.5128\u003C/End_x0020_Y\u003E\r\n  \u003C/_x0024_table_name_x0024_\u003E\r\n  \u003C_x0024_table_name_x0024_\u003E\r\n    \u003CCount\u003E1\u003C/Count\u003E\r\n    \u003CName\u003ELine\u003C/Name\u003E\r\n    \u003CStart_x0020_X\u003E25.2219\u003C/Start_x0020_X\u003E\r\n    \u003CStart_x0020_Y\u003E6.5128\u003C/Start_x0020_Y\u003E\r\n    \u003CEnd_x0020_X\u003E26.6296\u003C/End_x0020_X\u003E\r\n    \u003CEnd_x0020_Y\u003E8.6525\u003C/End_x0020_Y\u003E\r\n  \u003C/_x0024_table_name_x0024_\u003E\r\n  \u003C_x0024_table_name_x0024_\u003E\r\n    \u003CCount\u003E1\u003C/Count\u003E\r\n    \u003CName\u003ELine\u003C/Name\u003E\r\n    \u003CStart_x0020_X\u003E26.6296\u003C/Start_x0020_X\u003E\r\n    \u003CStart_x0020_Y\u003E8.6525\u003C/Start_x0020_Y\u003E\r\n    \u003CEnd_x0020_X\u003E29.0261\u003C/End_x0020_X\u003E\r\n    \u003CEnd_x0020_Y\u003E7.7488\u003C/End_x0020_Y\u003E\r\n  \u003C/_x0024_table_name_x0024_\u003E\r\n  \u003C_x0024_table_name_x0024_\u003E\r\n    \u003CCount\u003E1\u003C/Count\u003E\r\n    \u003CName\u003ELine\u003C/Name\u003E\r\n    \u003CStart_x0020_X\u003E29.0261\u003C/Start_x0020_X\u003E\r\n    \u003CStart_x0020_Y\u003E7.7488\u003C/Start_x0020_Y\u003E\r\n    \u003CEnd_x0020_X\u003E30.4338\u003C/End_x0020_X\u003E\r\n    \u003CEnd_x0020_Y\u003E9.8885\u003C/End_x0020_Y\u003E\r\n  \u003C/_x0024_table_name_x0024_\u003E\r\n  \u003C_x0024_table_name_x0024_\u003E\r\n    \u003CCount\u003E1\u003C/Count\u003E\r\n    \u003CName\u003ELine\u003C/Name\u003E\r\n    \u003CStart_x0020_X\u003E30.4338\u003C/Start_x0020_X\u003E\r\n    \u003CStart_x0020_Y\u003E9.8885\u003C/Start_x0020_Y\u003E\r\n    \u003CEnd_x0020_X\u003E32.8303\u003C/End_x0020_X\u003E\r\n    \u003CEnd_x0020_Y\u003E8.9849\u003C/End_x0020_Y\u003E\r\n  \u003C/_x0024_table_name_x0024_\u003E\r\n  \u003C_x0024_table_name_x0024_\u003E\r\n    \u003CCount\u003E1\u003C/Count\u003E\r\n    \u003CName\u003ELine\u003C/Name\u003E\r\n    \u003CStart_x0020_X\u003E32.8303\u003C/Start_x0020_X\u003E\r\n    \u003CStart_x0020_Y\u003E8.9849\u003C/Start_x0020_Y\u003E\r\n    \u003CEnd_x0020_X\u003E34.2380\u003C/End_x0020_X\u003E\r\n    \u003CEnd_x0020_Y\u003E11.1246\u003C/End_x0020_Y\u003E\r\n  \u003C/_x0024_table_name_x0024_\u003E\r\n  \u003C_x0024_table_name_x0024_\u003E\r\n    \u003CCount\u003E1\u003C/Count\u003E\r\n    \u003CName\u003ELine\u003C/Name\u003E\r\n    \u003CStart_x0020_X\u003E34.2380\u003C/Start_x0020_X\u003E\r\n    \u003CStart_x0020_Y\u003E11.1246\u003C/Start_x0020_Y\u003E\r\n    \u003CEnd_x0020_X\u003E36.6346\u003C/End_x0020_X\u003E\r\n    \u003CEnd_x0020_Y\u003E10.2210\u003C/End_x0020_Y\u003E\r\n  \u003C/_x0024_table_name_x0024_\u003E\r\n  \u003C_x0024_table_name_x0024_\u003E\r\n    \u003CCount\u003E1\u003C/Count\u003E\r\n    \u003CName\u003ELine\u003C/Name\u003E\r\n    \u003CStart_x0020_X\u003E36.6346\u003C/Start_x0020_X\u003E\r\n    \u003CStart_x0020_Y\u003E10.2210\u003C/Start_x0020_Y\u003E\r\n    \u003CEnd_x0020_X\u003E38.0423\u003C/End_x0020_X\u003E\r\n    \u003CEnd_x0020_Y\u003E12.3607\u003C/End_x0020_Y\u003E\r\n  \u003C/_x0024_table_name_x0024_\u003E\r\n\u003C/NewDataSet\u003E"
+    ],
+    "$type": "Autodesk.AutoCAD.DataExtraction.DxReport"
+  },
+  "outputSettings": {
+    "ouputFlags": 1,
+    "fileName": "C:\\Users\\alter\\OneDrive\\Copias Seguridad Acer 2025\\OneDrive\\ACER 2025 COPIAS SEGURIDAD\\Escritorio\\Universidad\\PoliMi\\Polimi Clases\\2024-2025\\2nd Semester\\Advanced Dynamics\\FEM code\\Beams\\GreenBeams.csv",
+    "fileOutputType": 4,
+    "tableStyleName": "",
+    "manuallySetupTable": false,
+    "tableTitle": "",
+    "titleCellStyle": "",
+    "headerCellStyle": "",
+    "dataCellStyle": "",
+    "usePropertyNameAsColumnHeader": false,
+    "$type": "Autodesk.AutoCAD.DataExtraction.DxOutputSettings"
+  },
+  "wizardSettings": {
+    "displayOptions": 27,
+    "unselectedCategiries": [],
+    "selectedTypeNames": [
+      "Autodesk.AutoCAD.DatabaseServices.Line"
+    ],
+    "selectedPropertyNames": [
+      "AcDxObjectTypeGlobalName",
+      "AcDxObjectTypeName",
+      "EndPoint.X",
+      "EndPoint.Y",
+      "StartPoint.X",
+      "StartPoint.Y"
+    ],
+    "typeNameAlias": {},
+    "propertyNameAlias": {},
+    "$type": "Autodesk.AutoCAD.DataExtraction.WizardSettings"
+  }
+}
