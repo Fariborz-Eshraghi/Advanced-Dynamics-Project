@@ -1,32 +1,44 @@
 clear all; close all; clc;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Load input file and assemble structure
+%% -----------------Point 1) FE Model Definition---------------------------
 [file_i,xy,nnod,sizee,idb,ndof,incid,l,gamma,m,EA,EJ,posiz,nbeam,pr]=loadstructure;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Draw structure
+
+% Draw structure
 dis_stru(posiz,l,gamma,xy,pr,idb,ndof);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Assemble mass and stiffness matrices
+
+% Assemble mass and stiffness matrices
 [M,K] = assem(incid,l,m,EA,EJ,gamma,idb);
 
-%% Free Coordinate Submatrices
+% Free Coordinate Submatrices
 MFF = M(1:ndof,1:ndof);
 KFF = K(1:ndof,1:ndof);
 
 MCF = M(ndof+1:end, 1:ndof);
 KCF = K(ndof+1:end, 1:ndof);
 
-%% Point 2) Eigenmodes/shapes
+%% --------------------- Point 2) Eigenmodes/shapes------------------------
 [modes, omega2] = eig(MFF\KFF);
 omega = sqrt(diag(omega2));
-% Sort frequencies in ascending order put
+
+% Sort frequencies in ascending order
 [omega,i_omega] = sort(omega);
 freq0 = omega/2/pi;
+
 % Sort mode shapes in ascending order 
 modes = modes(:,i_omega);
 
-%% Damping Matrix
+%----------------- Mode Shape Plots up to 3rd mode-------------------------
+scale_factor = -2;
+figure
+for i = 1:3
+    mode = modes(:,i);
+    subplot(3,1,i)
+    diseg2(mode,scale_factor,incid,l,gamma,posiz,idb,xy)
+    title(sprintf('Mode Shape %d, freq %.2f rad/s', [i, omega(i)/(2*pi)]));
+end
+
+% Damping Matrix
 alfa = 0.1;
 beta = 2e-4;
 
@@ -34,10 +46,11 @@ C = alfa*M + beta*K;
 CFF = C(1:ndof,1:ndof);
 CCF = C(ndof+1:end, 1:ndof);
 
-%% Force Vector
+%% ----------- Point 3) FRF of Force applied on point A -------------------
 F0 = zeros(ndof, 1);
 F0(idb(41,2)) = 1; % We have a vertical force (idx 2) on node 21 (row 21)
 
+% ---------------------- Generate FRF arrays-------------------------------
 % Frequency range
 om = (0:0.01:20)*2*pi;
 
@@ -55,7 +68,7 @@ for j = 1:length(om)
     rr(:,j) = (-om(j)^2*MCF + i*om(j)*CCF + KCF)*X(:,j);
 end
 
-%% Point 3) Plotting FRF
+%----------------------- Obtain FRFs -------------------------------------
 % Transfer Function Vertical Displacement in A
 idx_Ay = idb(41,2);
 G_Ay = X(idx_Ay,:);
@@ -64,7 +77,7 @@ G_Ay = X(idx_Ay,:);
 idx_By = idb(13,2);
 G_By = X(idx_By,:);
 
-% Plot Displacement FRFs
+% --------------------- Plot Displacement FRFs ---------------------------
 figure
 subplot(2,1,1)
 semilogy(om, abs(G_Ay), 'LineWidth', 1.5);
@@ -89,20 +102,9 @@ xlabel('Frequency (rad/s)')
 ylabel('Phase (rad/s)')
 hold on
 
-
-%% Mode Shape Plots
-scale_factor = -2;
-figure
-for i = 1:2
-    mode = modes(:,i);
-    subplot(2,1,i)
-    diseg2(mode,scale_factor,incid,l,gamma,posiz,idb,xy)
-    title(sprintf('Mode Shape %d, freq %.2f rad/s', [i, omega(i)]));
-end
-
-%% Point 4 Modal Superposition
+%% ----------------Point 4) Modal Superposition-----------------------------
 % Modal Matrices
-ii = 1:2;
+ii = 1:3;
 Phi = modes(:,ii);
 Mmod = Phi'*MFF*Phi;
 Kmod = Phi'*KFF*Phi;
@@ -120,6 +122,7 @@ xx_m = Phi*xx_mod;
 idx_By = idb(13,2);
 G_By_superimposed = xx_m(idx_By,:);
 
+%-------------------Modal Superimposition Plots----------------------------
 figure
 subplot(2,1,1)
 semilogy(om, abs(G_By), 'LineWidth', 1.5);
@@ -141,3 +144,15 @@ subplot(2,1,2)
 plot(om, angle(G_By_superimposed), 'LineWidth', 1.5);
 xlabel('Frequency (rad/s)')
 ylabel('Phase (rad/s)')
+
+%% -------------Point 5) Static Response of Weight-------------------------
+acc_0 = zeros(ndof, 1);
+acc_0(idb(:,2)) = -9.81;
+% acc_0(2:3:end) = -9.81;
+
+F_grav = M*acc_0;
+
+xF = KFF\F_grav(1:ndof);
+figure
+diseg2(xF,80,incid,l,gamma,posiz,idb,xy)
+title('static deflection');
