@@ -93,7 +93,7 @@ hold on
 subplot(2,1,1)
 semilogy(om, abs(G_By), 'LineWidth', 1.5);
 ylabel('abs(FRF)')
-title('Vertical Displacement FRFs');
+title('Point 3) Vertical Displacement FRFs');
 legend(['Point A';'Point B'])
 hold on
 subplot(2,1,2)
@@ -104,7 +104,7 @@ hold on
 
 %% ----------------Point 4) Modal Superposition-----------------------------
 % Modal Matrices
-ii = 1:3;
+ii = 1:2;
 Phi = modes(:,ii);
 Mmod = Phi'*MFF*Phi;
 Kmod = Phi'*KFF*Phi;
@@ -119,7 +119,6 @@ end
 xx_m = Phi*xx_mod;
 
 % Transfer Function of Modal Superimposition
-idx_By = idb(13,2);
 G_By_superimposed = xx_m(idx_By,:);
 
 %-------------------Modal Superimposition Plots----------------------------
@@ -127,7 +126,7 @@ figure
 subplot(2,1,1)
 semilogy(om, abs(G_By), 'LineWidth', 1.5);
 ylabel('abs(FRF)')
-title('FRF: Vertical Displacement in B vs Vertical force in A');
+title('Point 4) FRF: Vertical Displacement in B vs Vertical force in A');
 hold on
 subplot(2,1,2)
 plot(om, angle(G_By), 'LineWidth', 1.5);
@@ -136,16 +135,16 @@ ylabel('Phase (rad/s)')
 hold on
 
 subplot(2,1,1)
-semilogy(om, abs(G_By_superimposed), 'LineWidth', 1.5);
+semilogy(om, abs(G_By_superimposed), 'LineWidth', 1);
 ylabel('abs(FRF)')
 legend({'FEM'; 'Modal'})
 hold on
 subplot(2,1,2)
-plot(om, angle(G_By_superimposed), 'LineWidth', 1.5);
+plot(om, angle(G_By_superimposed), 'LineWidth', 1);
 xlabel('Frequency (rad/s)')
 ylabel('Phase (rad/s)')
 
-%% -------------Point 5) Static Response of Weight-------------------------
+%% -------------Point 5) Static Response of Weight and Deflection-------------------------
 acc_0 = zeros(ndof, 1);
 acc_0(idb(:,2)) = -9.81;
 % acc_0(2:3:end) = -9.81;
@@ -155,4 +154,9 @@ F_grav = M*acc_0;
 xF = KFF\F_grav(1:ndof);
 figure
 diseg2(xF,80,incid,l,gamma,posiz,idb,xy)
-title('static deflection');
+title('Point 5) Static Deflection');
+
+[max_deflection, idx] = max(abs(xF));
+
+%% -----------Point 6) Moving load time history--------------------------------------------
+

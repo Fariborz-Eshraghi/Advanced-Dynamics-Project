@@ -7,10 +7,10 @@ elemCounter = 1;
 
 filesAndNodes = {
     'Beams/RedBeam.csv', 41, 1;
-    'Beams/GreenBeams.csv', 6, 2;
-    'Beams/BlueBeam1.csv', 8, 3;
-    'Beams/BlueBeam2.csv', 6, 3;
-    'Beams/BlueBeam3.csv', 8, 3;
+    'Beams/GreenBeams.csv', 3, 2;
+    'Beams/BlueBeam1.csv', 4, 3;
+    'Beams/BlueBeam2.csv', 3, 3;
+    'Beams/BlueBeam3.csv', 4, 3;
 };
 
 % Tolerance for node uniqueness
