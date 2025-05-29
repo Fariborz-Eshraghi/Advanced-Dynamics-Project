@@ -258,6 +258,46 @@ xlabel('Time [s]')
 ylabel('y_A [m]')
 title('Point 6) Vertical Displacement History Point A, Load: 50kN, Velocity: 2m/s')
 
+%% -----------Point 7) Proposal for reducing the static deformation--------------------------------------------
+total_mass1 = l*m';
+
+
+[file_i2,xy2,nnod2,sizee2,idb2,ndof2,incid2,l2,gamma2,m2,EA2,EJ2,posiz2,nbeam2,pr2] = loadstructure;
+
+% Draw structure
+dis_stru(posiz2,l2,gamma2,xy2,pr2,idb2,ndof2);
+
+% Assemble mass and stiffness matrices
+[M2,K2] = assem(incid2,l2,m2,EA2,EJ2,gamma2,idb2);
+
+% Free Coordinate Submatrices
+MFF2 = M2(1:ndof2,1:ndof2);
+KFF2 = K2(1:ndof2,1:ndof2);
+
+MCF2 = M2(ndof2+1:end, 1:ndof2);
+KCF2 = K2(ndof2+1:end, 1:ndof2);
+
+%-------------------------------------------------
+
+total_mass2 = l2*m2';
+
+acc_02 = zeros(ndof2, 1);
+acc_02(idb2(:,2)) = -9.81;
+% acc_0(2:3:end) = -9.81;
+
+F_grav2 = M2*acc_02;
+
+xF2 = KFF2\F_grav2(1:ndof2);
+figure
+total_deformation2 = diseg3(xF2,80,incid2,l2,gamma2,posiz2,idb2,xy2);
+title('Point 7) Static Deflection proposal');
+
+%--------------------
+perc_mass = total_mass2/total_mass1
+prtg_of_improvement = (total_deformation1-total_deformation2)/total_deformation1
+
+
+%% ODE FUNCTIONS FOR POINT 6)
 
 function dXdt = odefn(t, X, t_vect, Qn_global, Mmod, Kmod, Cmod)
     % Interpolate the modal force Qn_global at time t
@@ -273,4 +313,90 @@ function dXdt = odefn(t, X, t_vect, Qn_global, Mmod, Kmod, Cmod)
 
     % Return concatenated derivative vector
     dXdt = [dq; dq_dot];
+end
+
+
+%% DISSEG MODIFICATION FOR POINT 7) %%
+
+function sum_def = diseg3(mode,scale_factor,incidenze,l,gamma,posiz,idb,xy)
+    sum_def = 0;
+    % Checking consistency input data
+    [n_el,nc]=size(incidenze);
+    
+    if length(posiz) ~= n_el
+        sprintf('Error: number of nodes in posit matrix differs from number of elements')
+        return
+    end
+    
+    n_gdl=length(mode);
+    
+    
+    hold on
+    % looping on the finite elements
+    for k=1:n_el
+    % building the nodal displacements vector of each element in the global
+    % reference frame
+        for iri=1:6
+            if incidenze(k,iri) <= n_gdl
+            xkG(iri,1)=mode(incidenze(k,iri));
+            else
+            xkG(iri,1)=0.;
+            end
+        end
+    % Applying scale factor
+        xkG=scale_factor*xkG;
+    % Global to Local reference frame rotation
+        lambda = [ cos(gamma(k)) sin(gamma(k)) 0. 
+                  -sin(gamma(k)) cos(gamma(k)) 0.
+	                    0.      0.     1. ] ;
+        Lambda = [ lambda     zeros(3)
+                  zeros(3)   lambda      ] ;
+        xkL=Lambda*xkG;
+    
+    % Computing the axial (u) and transversal (w) displacements by means of
+    % shape functions
+        csi=l(k)*[0:0.05:1];
+        fu=zeros(6,length(csi));
+        fu(1,:)=1-csi/l(k);
+        fu(4,:)=csi/l(k);
+        u=(fu'*xkL)';
+        fw=zeros(6,length(csi));
+        fw(2,:)=2*(csi/l(k)).^3-3*(csi/l(k)).^2+1;
+        fw(3,:)=l(k)*((csi/l(k)).^3-2*(csi/l(k)).^2+csi/l(k));
+        fw(5,:)=-2*(csi/l(k)).^3+3*(csi/l(k)).^2;
+        fw(6,:)=l(k)*((csi/l(k)).^3-(csi/l(k)).^2);
+        w=(fw'*xkL)';
+        
+        sum_def = sum_def + norm(u+w*1j);
+    
+    
+    % Local to global transformation of the element's deformation
+        xyG=lambda(1:2,1:2)'*[u+csi;w];
+        undef=lambda(1:2,1:2)'*[csi;zeros(1,length(csi))];
+     % Plotting deformed and undeformed element's shape
+        plot(undef(1,:)+posiz(k,1),undef(2,:)+posiz(k,2),'b--')
+        plot(xyG(1,:)+posiz(k,1),xyG(2,:)+posiz(k,2),'b')
+    end
+    
+    % Looping the nodes
+    n_nodi=size(idb,1);
+    xkG=[];
+    for k=1:n_nodi
+        for ixy=1:2
+            if idb(k,ixy) <= n_gdl
+            xkG(k,ixy)=mode(idb(k,ixy));
+            else
+            xkG(k,ixy)=0.;
+            end
+        end
+    end
+    xkG=scale_factor*xkG;
+    xyG=xkG+xy;
+    plot(xy(:,1),xy(:,2),'b.')
+    plot(xyG(:,1),xyG(:,2),'bo')
+    
+    grid on
+    box on
+    axis equal
+
 end
